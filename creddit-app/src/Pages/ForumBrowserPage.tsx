@@ -16,59 +16,57 @@ export default function ForumBrowserPage() {
   const formBrowseAPIURL = "https://awf-api.lvl99.dev";
   const token = localStorage.getItem("token");
 
-
   // this is the post filter to sort by hot and limit to 10 posts, it will be appended to the API endpoint when fetching posts
   const postFilter = "?sort=hot&limit=10";
 
   async function loadForumPosts() {
-  if (!forumName) return;
+    if (!forumName) return;
 
-  // reset state before loading new posts
-  setLoading(true);
+    setLoading(true);
+    setError(null);
 
-  // this will clear any previous error message when we start loading new posts, so the user won't be confused by old error messages when they try to load a new forum
-  setError(null);
+    try {
+      // here we fetch the posts from the API using the forum name and the post filter (sort by hot and limit to 10 posts)
+      // encode the forumName to avoid issues with spaces/special chars
+      const url = `${formBrowseAPIURL}/forums/${encodeURIComponent(forumName)}${postFilter}`;
+      console.log("Requesting:", url);
 
-  try {
-    // here we fetch the posts from the API using the forum name and the post filter (sort by hot and limit to 10 posts)
-    const forumAPICallURl = `${formBrowseAPIURL}/forums/${encodeURIComponent(forumName)}${postFilter}`;
-    console.log("Requesting:", forumAPICallURl);
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
 
-    // this is the request for the API , includes token header i dont think we need to add MEthod GET. 
-    const response = await fetch(forumAPICallURl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    });
+      console.log("Status:", response.status, response.statusText);
 
-    console.log("Status:", response.status, response.statusText);
+      // read raw text first so we can log helpful error bodies for debugging
+      const text = await response.text();
+      console.log("Response body:", text);
 
-    const text = await response.text();
-    console.log("Response body:", text);
+      if (!response.ok) {
+        const serverMessage = text ? ` — ${text}` : "";
+        setError(`Forum "${forumName}" not found or API endpoint is incorrect.${serverMessage}`);
+        setPosts([]);
+        setLoading(false);
+        return;
+      }
 
-    if (!response.ok) {
-      const serverMessage = text ? ` — ${text}` : "";
-      setError(`Forum "${forumName}" not found or API endpoint is incorrect.${serverMessage}`);
+      // parse the JSON returned from the forum endpoint
+      const data = JSON.parse(text);
+
+      // the forum endpoint already returns full post objects
+      // so we do not need to fetch posts by ids again
+      setPosts(data);
+      setLoading(false);
+
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load posts. Check console for details.");
       setPosts([]);
       setLoading(false);
-      return;
     }
-
-    // parse the JSON returned from the forum endpoint
-    const data = JSON.parse(text);
-
-    // display the posts 
-    setPosts(data);
-    setLoading(false);
-
-  } catch (err) {
-    console.error(err);
-    setError("Failed to load posts. Check console for details.");
-    setPosts([]);
-    setLoading(false);
   }
-}
 
   return (
     <Stack gap="md">
@@ -80,7 +78,7 @@ export default function ForumBrowserPage() {
 
       <TextInput
         label="Forum name"
-        placeholder="Eneter forum name (e.g., 'funny')"
+        placeholder="Enter forum name (e.g., 'funny')"
         value={forumName}
         onChange={(e) => setForumName(e.target.value)}
         onKeyDown={(e) => {
@@ -101,9 +99,24 @@ export default function ForumBrowserPage() {
       {posts.length > 0 ? (
         posts.map((post) => (
           <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder>
-            <Text>{post.title}</Text>
-            <Text size="sm" color="dimmed">
-              {post.author} — {new Date(post.created_utc * 1000).toLocaleString()}
+            {/* display post title */}
+            <Text fw={600} size="lg">
+              {post.title}
+            </Text>
+
+            {/* and post content */}
+            <Text size="sm" mt="xs">
+              {post.content}
+            </Text>
+
+            {/* post author here */}
+            <Text size="sm" c="dimmed" mt="sm">
+              Author: {post.author || "Unknown"}
+            </Text>
+
+            {/* total likes they get */}
+            <Text size="sm" c="dimmed">
+              Likes: {post.score ?? 0}
             </Text>
           </Card>
         ))
@@ -115,4 +128,3 @@ export default function ForumBrowserPage() {
     </Stack>
   );
 }
-
