@@ -1,5 +1,6 @@
 
 
+import { Center, Box } from '@mantine/core';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 
@@ -8,7 +9,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ padding: "20px" }}>
       <header style={{ marginBottom: "20px" }}>
-        <h1>Creddit App</h1>
+        <Center h={100}>
+          <Box bg="var(--mantine-color-blue-light)"p="md"style={{ padding: "100px", borderRadius: "8px", fontWeight: 600,fontSize: "20px",}}>
+            Credit - App
+          </Box>
+        </Center>
       </header>
 
       <main>{children}</main>
