@@ -86,9 +86,27 @@ export default function ForumBrowserPage() {
         }}
       />
 
-      <Button onClick={loadForumPosts} disabled={loading}>
-        {loading ? "Loading…" : "Load Top 10 Hot Posts"}
+      <Button 
+        onClick={loadForumPosts} 
+        disabled={loading}
+        style={{
+          padding: "10px",
+          borderRadius: "0px",
+          border: "none",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          fontSize: "15px",
+          cursor: "pointer",
+          width: 250,
+          paddingTop: "12px",
+          paddingBottom: "12px",
+        }}
+      >
+        {loading ? "Loading…" : "Load Top 10 Hot Posts"} 
       </Button>
+
+
+  
 
       {error && (
         <Text c="red" size="sm">

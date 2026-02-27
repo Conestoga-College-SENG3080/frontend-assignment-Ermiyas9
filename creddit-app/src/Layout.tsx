@@ -1,36 +1,43 @@
 // src/Layout.tsx
 import React from "react";
+import { Container, Paper, Title, Text } from "@mantine/core";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const username = localStorage.getItem("username");
+  const studentID = localStorage.getItem("password");
 
-  // This is a simple layout component that wraps around the main content of the app.
-  // i am going to use it to add a header and some padding around the main content.
   return (
-    <div style={{ padding: "20px" }}>
-      <header
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: "20px",
-          marginTop: "0px",
-        }}
-      >
-        <div
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f0f2f5", 
+        padding: "30px",
+        fontFamily: "Inter, sans-serif",
+      }}
+    >
+      <Container size="md">
+        <Paper
+          shadow="sm"
+          p="lg"
+          radius="md"
           style={{
-            padding: "20px 40px",
-            borderRadius: "8px",
-            fontWeight: 700,
-            fontSize: "40px",
+            marginBottom: "30px",
             textAlign: "center",
+            backgroundColor: "white",
           }}
         >
-          Credit - App
-        </div>
-      </header>
+          <Title order={2} style={{ padding: "10px", color:  "#4CAF50", fontWeight: "bolder",fontSize: "30px", marginBottom: "10px" }}>
+            Creddit App
+          </Title>
 
-      <main>{children}</main>
+          <Text size="lg" style={{ fontWeight: 500 }}>
+            User: {username ?? "Unknown"} &nbsp;|&nbsp; Student ID:{" "}
+            {studentID ?? "Unknown"}
+          </Text>
+        </Paper>
+
+        <main>{children}</main>
+      </Container>
     </div>
   );
 }
