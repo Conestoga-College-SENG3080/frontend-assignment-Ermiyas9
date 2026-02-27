@@ -5,48 +5,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-
 export default function LoginPage() {
-  const [username, setusername] = useState("");
-  const [password, setThePassword] = useState("");
-  const loginAPI = "https://awf-api.lvl99.dev/auth/login"
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const loginAPI = "https://awf-api.lvl99.dev/auth/login";
   const navigate = useNavigate();
 
   async function handleLogin() {
-
-   const response = await fetch(loginAPI, {
+    const response = await fetch(loginAPI, {
       method: "POST",
-     headers: {
-        "Content-Type": "application/json"
-     },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
-   })
+    if (!response.ok) {
+      alert("Invalid username or password");
+      return;
+    }
 
-   if (!response.ok) {
-      alert("Invalid username or password")
-      return
-   }
+    const data = await response.json();
 
-   const data = await response.json()
+    // this will save the token so Layout can use it to fetch the posts and display them in the forum browser page
+    localStorage.setItem("token", data.access_token);
 
-   //  this will save the token so Layout so i can use it to fetch the posts and display them in the forum browser page
-   localStorage.setItem("token", data.access_token)
+    // after login, the username and password will be saved in the local storage so 
+    // it can be used to display the username in the forum browser page 
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
 
-   // so after login, the username and password will be saved in the local storage so 
-   // i can use them to display the username in the forum browser page 
-   localStorage.setItem("username", username);
-   localStorage.setItem("password", password);
-
-
-   // After login, go to forum browser page
-   navigate("/ForumBrowserPage")
-
-}
+    // After login, go to forum browser page
+    navigate("/ForumBrowserPage");
+  }
 
   return (
     <div
@@ -58,6 +49,10 @@ export default function LoginPage() {
       }}
     >
       <form
+        onSubmit={(e) => {
+          e.preventDefault(); // prevent page reload
+          handleLogin();
+        }}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -75,7 +70,7 @@ export default function LoginPage() {
           type="text"
           placeholder="Student ID"
           value={username}
-          onChange={(e) => setusername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value)}
           style={{
             padding: "10px",
             borderRadius: "6px",
@@ -86,9 +81,9 @@ export default function LoginPage() {
 
         <input
           type="password"
-          placeholder="password"
+          placeholder="Password"
           value={password}
-          onChange={(e) => setThePassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           style={{
             padding: "10px",
             borderRadius: "6px",
@@ -98,8 +93,7 @@ export default function LoginPage() {
         />
 
         <button
-          type="button"
-          onClick={handleLogin}
+          type="submit"
           style={{
             padding: "10px",
             borderRadius: "6px",
@@ -117,6 +111,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-
-
