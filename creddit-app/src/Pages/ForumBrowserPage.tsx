@@ -61,13 +61,17 @@ export default function ForumBrowserPage() {
       return null;
     }
   }
+   // stoting favorites in local state so i cann easly check if the post is favorited or not. 
+  const [favorites, setFavorites] = useState<string[]>(() => {
+  const stored = localStorage.getItem("favorites");
+    return stored ? JSON.parse(stored) : [];
+  });
 
   async function loadForumPosts() {
+    
     if (!forumName) return;
-
     setLoading(true);
     setError(null);
-
     try {
       // Remove any old token before fetching a new one
       localStorage.removeItem("token");
@@ -136,7 +140,7 @@ export default function ForumBrowserPage() {
           <label style={{ fontWeight: 600, fontSize: "20px", marginBottom: "5px" }}>Forum name</label>
           <input
             type="text"
-            placeholder="Enter forum name (e.g., 'funny')"
+            placeholder="Enter forum name (e.g., 'funny', 'showerthoughts', 'music', 'aww',...)"
             value={forumName}
             onChange={(e) => setForumName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") loadForumPosts(); }}
@@ -200,7 +204,12 @@ export default function ForumBrowserPage() {
         )}
 
         {posts.length > 0 ? (
-          posts.map((post) => (
+         posts.map((post) => {
+
+    // this is where we check if the post is in the favorites list, we get the favorites from local storage and check if the post id is in the favorites array
+    const isFavorite = favorites.includes(post.id); 
+    return (
+            
             <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder style={{ width: "100%" }}>
               <Text fw={600} size="lg">
                 {post.title}
@@ -214,9 +223,31 @@ export default function ForumBrowserPage() {
               <Text size="sm" c="dimmed">
                 Likes: {post.score ?? 0}
               </Text>
+              {/* then i add fav button here  */}
+              <Button
+                mt="md"
+                style={{
+                  // so the button will be yellow if the post is in favorites and green if not
+                  backgroundColor: isFavorite ? "yellow" : "#4CAF50", 
+                  color: isFavorite ? "black" : "white", 
+                }}
+                onClick={() => {
+                  let updated: string[];
+                  if (isFavorite) {
+                    updated = favorites.filter((id) => id !== post.id);
+                  } else {
+                    updated = [...favorites, post.id];
+                  }
+                  setFavorites(updated);
+                  localStorage.setItem("favorites", JSON.stringify(updated));
+                }}
+              >
+                {isFavorite ? "★ Favorited" : "☆ Add to Favorites"}
+              </Button>
             </Card>
-          ))
-        ) : (
+            );
+          })
+        ): (
           <div style={{ padding: "20px 20px" }}>
             <Text c="dimmed" ta="center" mt="xl">
               No posts to display. Search for a forum to begin.

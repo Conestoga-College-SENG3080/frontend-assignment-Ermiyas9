@@ -3,7 +3,7 @@ import { Text, Stack } from '@mantine/core';
 
 export default function FavouritesPage() {
 
-  const username = localStorage.getItem("username");
+  const username = import.meta.env.VITE_API_USERNAME;
 
 
   // This page will show posts the user has saved as favourites.
