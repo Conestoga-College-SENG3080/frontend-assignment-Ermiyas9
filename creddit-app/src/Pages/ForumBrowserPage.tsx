@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Card, Text, Stack, Button } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
+import favorited from "../assets/favorited.png";
+import unfavorited from "../assets/unfavorited.png";
 
 export default function ForumBrowserPage() {
   const [forumName, setForumName] = useState("");
@@ -242,7 +244,12 @@ export default function ForumBrowserPage() {
                   localStorage.setItem("favorites", JSON.stringify(updated));
                 }}
               >
-                {isFavorite ? <img width="48" height="48" src="https://img.icons8.com/fluency/48/hearts.png" alt="hearts" title="Favorited"/> : <img width="32" height="32" src="https://img.icons8.com/windows/32/hearts.png" alt="hearts"/>}
+                <img 
+                  src={isFavorite ? favorited : unfavorited} 
+                  alt={isFavorite ? "Favorited" : "Add to Favorites"} 
+                  style={{ width: "16px", height: "16px", paddingRight: "8px" }} 
+                />
+                {isFavorite ? "Favorited" : "Add to Favorites"}
               </Button>
             </Card>
             );
