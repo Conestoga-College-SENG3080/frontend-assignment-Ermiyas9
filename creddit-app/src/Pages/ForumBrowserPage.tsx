@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Card, Text, Stack, Button } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
-
-
 export default function ForumBrowserPage() {
   const [forumName, setForumName] = useState("");
   const [posts, setPosts] = useState<any[]>([]);
@@ -11,10 +9,9 @@ export default function ForumBrowserPage() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // user name and user password(StudentID) are saved in the local storage after login,
-  // so we can use them to display the username in the forum browser page
-  const username = localStorage.getItem("username");
-  const StudentID = localStorage.getItem("password");
+  // hardcoded username and password 
+  const username = "egulti"; 
+  const password = "8744128"; 
 
   // This is the base URL for the API, the token and the post
   const formBrowseAPIURL = "https://awf-api.lvl99.dev";
@@ -23,6 +20,36 @@ export default function ForumBrowserPage() {
   // this is the post filter to sort by hot and limit to 10 posts, it will be appended to the API endpoint when fetching posts
   const postFilter = "?sort=hot&limit=10";
 
+  // Function to get token from API using username and password
+  async function fetchToken() {
+    try {
+      const response = await fetch(`${formBrowseAPIURL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        setError(`Failed to get token. ${text}`);
+        return null;
+      }
+
+      const data = await response.json();
+      
+      // here im saving the token in local storage
+      localStorage.setItem("token", data.token); 
+      return data.token;
+      
+    } catch (err) {
+      console.error(err);
+      setError("Failed to get token. Check console for details.");
+      return null;
+    }
+  }
+
   async function loadForumPosts() {
     if (!forumName) return;
 
@@ -30,14 +57,25 @@ export default function ForumBrowserPage() {
     setError(null);
 
     try {
+
+      // Get token if it doesn't exist
+      let apiToken = token;
+      if (!apiToken) {
+        apiToken = await fetchToken();
+        if (!apiToken) {
+          setLoading(false);
+          return;
+        }
+      }
+
       // here we fetch the posts from the API using the forum name and the post filter (sort by hot and limit to 10 posts)
-      // encode the forumName to avoid issues with spaces/special chars
+      // encode helps to safely include forum names with spaces or special characters in the URL
       const url = `${formBrowseAPIURL}/forums/${encodeURIComponent(forumName)}${postFilter}`;
       console.log("Requesting:", url);
 
       const response = await fetch(url, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${apiToken}`,
           Accept: "application/json",
         },
       });
@@ -63,7 +101,6 @@ export default function ForumBrowserPage() {
       // so we do not need to fetch posts by ids again
       setPosts(data);
       setLoading(false);
-
     } catch (err) {
       console.error(err);
       setError("Failed to load posts. Check console for details.");
@@ -73,114 +110,109 @@ export default function ForumBrowserPage() {
   }
 
   return (
-  <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "left", padding: "20px" }}>
-  
-    <div style={{ width: "100%", maxWidth: "500px", textAlign: "left", marginBottom: "40px" }}>
-      <Text fz="2xl" fw={600}>
-        Welcome to Browse a Forum, {username}
-      </Text>
-      <Text fz="md" color="dimmed">
-        Student ID: {StudentID}
-      </Text>
-    </div>
-
- 
-    <Stack gap="md" align="center" style={{ width: "100%", maxWidth: "500px" }}>
-      <div style={{ padding: "20px", width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
-        <label style={{ fontWeight: 600, fontSize: "20px", marginBottom: "5px" }}>Forum name</label>
-        <input
-          type="text"
-          placeholder="Enter forum name (e.g., 'funny')"
-          value={forumName}
-          onChange={(e) => setForumName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") loadForumPosts();
-          }}
-          style={{
-            padding: "12px 15px",
-            fontSize: "16px",
-            height: "50px",
-            width: "100%",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            boxSizing: "border-box",
-            outline: "none",
-            transition: "border-color 0.2s",
-          }}
-        />
+    <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "left", padding: "20px" }}>
+      <div style={{ width: "100%", maxWidth: "500px", textAlign: "left", marginBottom: "40px" }}>
+        <Text fz="2xl" fw={600}>
+          Welcome to Browse a Forum, {username}
+        </Text>
+        <Text fz="md" color="dimmed">
+          Student ID: {password}
+        </Text>
       </div>
 
-    <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "20px", width: "100%" }}>
-      <Button
-        onClick={loadForumPosts}
-        disabled={loading}
-        style={{
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "none",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          fontSize: "16px",
-          cursor: loading ? "not-allowed" : "pointer",
-          width: "250px",
-          height: "50px",
-          transition: "background-color 0.2s",
-        }}
-      >
-        {loading ? "Loading…" : "Load Top 10 Hot Posts"}
-      </Button>
-
-      <Button
-        onClick={() => navigate("/favourites")}
-        style={{
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "none",
-           backgroundColor: "#4CAF50",
-          color: "white",
-          fontSize: "16px",
-          width: "250px",
-          height: "50px",
-          cursor: "pointer",
-          transition: "background-color 0.2s",
-        }}
-      >
-        Favorites
-      </Button>
-    </div>
-
-      {error && (
-        <Text c="red" size="sm">
-          {error}
-        </Text>
-      )}
-
-      {posts.length > 0 ? (
-        posts.map((post) => (
-          <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder style={{ width: "100%" }}>
-            <Text fw={600} size="lg">
-              {post.title}
-            </Text>
-            <Text size="sm" mt="xs">
-              {post.content}
-            </Text>
-            <Text size="sm" c="dimmed" mt="sm">
-              Author: {post.author || "Unknown"}
-            </Text>
-            <Text size="sm" c="dimmed">
-              Likes: {post.score ?? 0}
-            </Text>
-          </Card>
-        ))
-      ) : (
-        <div style={{ padding: "20px 20px" }}>
-          <Text c="dimmed" ta="center" mt="xl">
-            No posts to display. Search for a forum to begin.
-          </Text>
+      <Stack gap="md" align="center" style={{ width: "100%", maxWidth: "500px" }}>
+        <div style={{ padding: "20px", width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <label style={{ fontWeight: 600, fontSize: "20px", marginBottom: "5px" }}>Forum name</label>
+          <input
+            type="text"
+            placeholder="Enter forum name (e.g., 'funny')"
+            value={forumName}
+            onChange={(e) => setForumName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") loadForumPosts(); }}
+            style={{
+              padding: "12px 15px",
+              fontSize: "16px",
+              height: "50px",
+              width: "100%",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              boxSizing: "border-box",
+              outline: "none",
+              transition: "border-color 0.2s",
+            }}
+          />
         </div>
-    
-      )}
-    </Stack>
-  </div>
-);  
+
+        <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "20px", width: "100%" }}>
+          <Button
+            onClick={loadForumPosts}
+            disabled={loading}
+            style={{
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "none",
+              backgroundColor: "#4CAF50",
+              color: "white",
+              fontSize: "16px",
+              cursor: loading ? "not-allowed" : "pointer",
+              width: "250px",
+              height: "50px",
+              transition: "background-color 0.2s",
+            }}
+          >
+            {loading ? "Loading…" : "Load Top 10 Hot Posts"}
+          </Button>
+
+          <Button
+            onClick={() => navigate("/favourites")}
+            style={{
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "none",
+              backgroundColor: "#4CAF50",
+              color: "white",
+              fontSize: "16px",
+              width: "250px",
+              height: "50px",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
+            }}
+          >
+            Favorites
+          </Button>
+        </div>
+
+        {error && (
+          <Text c="red" size="sm">
+            {error}
+          </Text>
+        )}
+
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder style={{ width: "100%" }}>
+              <Text fw={600} size="lg">
+                {post.title}
+              </Text>
+              <Text size="sm" mt="xs">
+                {post.content}
+              </Text>
+              <Text size="sm" c="dimmed" mt="sm">
+                Author: {post.author || "Unknown"}
+              </Text>
+              <Text size="sm" c="dimmed">
+                Likes: {post.score ?? 0}
+              </Text>
+            </Card>
+          ))
+        ) : (
+          <div style={{ padding: "20px 20px" }}>
+            <Text c="dimmed" ta="center" mt="xl">
+              No posts to display. Search for a forum to begin.
+            </Text>
+          </div>
+        )}
+      </Stack>
+    </div>
+  );
 }

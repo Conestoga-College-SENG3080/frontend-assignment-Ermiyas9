@@ -1,11 +1,9 @@
 // src/pages/FavouritesPage.tsx
-import { Card, Text, Stack } from '@mantine/core';
+import { Text, Stack } from '@mantine/core';
 
 export default function FavouritesPage() {
 
   const username = localStorage.getItem("username");
-
-
 
 
   // This page will show posts the user has saved as favourites.

@@ -3,14 +3,14 @@ import React from "react";
 import { Container, Paper, Title, Text } from "@mantine/core";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const username = localStorage.getItem("username");
-  const studentID = localStorage.getItem("password");
+  const username = "egulti";
+  const studentID = "8744128";
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#f0f2f5", 
+        backgroundColor: "#f0f2f5",
         padding: "30px",
         fontFamily: "Inter, sans-serif",
       }}
@@ -26,13 +26,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             backgroundColor: "white",
           }}
         >
-          <Title order={2} style={{ padding: "10px", color:  "#4CAF50", fontWeight: "bolder",fontSize: "30px", marginBottom: "10px" }}>
+          <Title
+            order={2}
+            style={{
+              padding: "10px",
+              color: "#4CAF50",
+              fontWeight: "bolder",
+              fontSize: "30px",
+              marginBottom: "10px",
+            }}
+          >
             Creddit App
           </Title>
 
-          <Text size="lg" style={{ forfontWeight: 500 }}>
-            User: {username ?? "Unknown"} &nbsp;|&nbsp; Student ID:{" "}
-            {studentID ?? "Unknown"}
+          <Text size="lg" style={{ fontWeight: 500 }}>
+            User: {username} &nbsp;|&nbsp; Student ID: {studentID || "N/A"}
           </Text>
         </Paper>
 
