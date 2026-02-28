@@ -242,7 +242,7 @@ export default function ForumBrowserPage() {
                   localStorage.setItem("favorites", JSON.stringify(updated));
                 }}
               >
-                {isFavorite ? "★ Favorited" : "☆ Add to Favorites"}
+                {isFavorite ? <img width="48" height="48" src="https://img.icons8.com/fluency/48/hearts.png" alt="hearts" title="Favorited"/> : <img width="32" height="32" src="https://img.icons8.com/windows/32/hearts.png" alt="hearts"/>}
               </Button>
             </Card>
             );
