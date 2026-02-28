@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { Card, Text, Stack, TextInput, Button } from "@mantine/core";
+import { Card, Text, Stack, Button } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
+
+
 
 export default function ForumBrowserPage() {
   const [forumName, setForumName] = useState("");
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // user name and user password(StudentID) are saved in the local storage after login,
   // so we can use them to display the username in the forum browser page
@@ -69,44 +73,81 @@ export default function ForumBrowserPage() {
   }
 
   return (
-    <Stack gap="md">
-      <Text fz="xl" fw={500}>
+  <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "left", padding: "20px" }}>
+  
+    <div style={{ width: "100%", maxWidth: "500px", textAlign: "left", marginBottom: "40px" }}>
+      <Text fz="2xl" fw={600}>
         Welcome to Browse a Forum, {username}
       </Text>
+      <Text fz="md" color="dimmed">
+        Student ID: {StudentID}
+      </Text>
+    </div>
 
-      <Text>Student ID {StudentID}</Text>
+ 
+    <Stack gap="md" align="center" style={{ width: "100%", maxWidth: "500px" }}>
+      <div style={{ padding: "20px", width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <label style={{ fontWeight: 600, fontSize: "20px", marginBottom: "5px" }}>Forum name</label>
+        <input
+          type="text"
+          placeholder="Enter forum name (e.g., 'funny')"
+          value={forumName}
+          onChange={(e) => setForumName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") loadForumPosts();
+          }}
+          style={{
+            padding: "12px 15px",
+            fontSize: "16px",
+            height: "50px",
+            width: "100%",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            boxSizing: "border-box",
+            outline: "none",
+            transition: "border-color 0.2s",
+          }}
+        />
+      </div>
 
-      <TextInput
-        label="Forum name"
-        placeholder="Enter forum name (e.g., 'funny')"
-        value={forumName}
-        onChange={(e) => setForumName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") loadForumPosts();
-        }}
-      />
-
-      <Button 
-        onClick={loadForumPosts} 
+    <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "20px", width: "100%" }}>
+      <Button
+        onClick={loadForumPosts}
         disabled={loading}
         style={{
-          padding: "10px",
-          borderRadius: "0px",
+          padding: "12px 20px",
+          borderRadius: "8px",
           border: "none",
           backgroundColor: "#4CAF50",
           color: "white",
-          fontSize: "15px",
-          cursor: "pointer",
-          width: 250,
-          paddingTop: "12px",
-          paddingBottom: "12px",
+          fontSize: "16px",
+          cursor: loading ? "not-allowed" : "pointer",
+          width: "250px",
+          height: "50px",
+          transition: "background-color 0.2s",
         }}
       >
-        {loading ? "Loading…" : "Load Top 10 Hot Posts"} 
+        {loading ? "Loading…" : "Load Top 10 Hot Posts"}
       </Button>
 
-
-  
+      <Button
+        onClick={() => navigate("/favourites")}
+        style={{
+          padding: "12px 20px",
+          borderRadius: "8px",
+          border: "none",
+           backgroundColor: "#4CAF50",
+          color: "white",
+          fontSize: "16px",
+          width: "250px",
+          height: "50px",
+          cursor: "pointer",
+          transition: "background-color 0.2s",
+        }}
+      >
+        Favorites
+      </Button>
+    </div>
 
       {error && (
         <Text c="red" size="sm">
@@ -116,33 +157,30 @@ export default function ForumBrowserPage() {
 
       {posts.length > 0 ? (
         posts.map((post) => (
-          <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder>
-            {/* display post title */}
+          <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder style={{ width: "100%" }}>
             <Text fw={600} size="lg">
               {post.title}
             </Text>
-
-            {/* and post content */}
             <Text size="sm" mt="xs">
               {post.content}
             </Text>
-
-            {/* post author here */}
             <Text size="sm" c="dimmed" mt="sm">
               Author: {post.author || "Unknown"}
             </Text>
-
-            {/* total likes they get */}
             <Text size="sm" c="dimmed">
               Likes: {post.score ?? 0}
             </Text>
           </Card>
         ))
       ) : (
-        <Text c="dimmed" ta="center" mt="xl">
-          No posts to display. Search for a forum to begin.
-        </Text>
+        <div style={{ padding: "20px 20px" }}>
+          <Text c="dimmed" ta="center" mt="xl">
+            No posts to display. Search for a forum to begin.
+          </Text>
+        </div>
+    
       )}
     </Stack>
-  );
+  </div>
+);  
 }

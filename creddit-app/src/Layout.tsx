@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             Creddit App
           </Title>
 
-          <Text size="lg" style={{ fontWeight: 500 }}>
+          <Text size="lg" style={{ forfontWeight: 500 }}>
             User: {username ?? "Unknown"} &nbsp;|&nbsp; Student ID:{" "}
             {studentID ?? "Unknown"}
           </Text>
