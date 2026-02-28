@@ -7,23 +7,22 @@ export default function ForumBrowserPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate();   
 
-  // hardcoded username and password 
-  const username = "egulti"; 
-  const password = "8744128"; 
+  const username = import.meta.env.VITE_API_USERNAME;
+  const password = import.meta.env.VITE_API_PASSWORD;
+  const baseURL = import.meta.env.VITE_API_URL;
 
-  // This is the base URL for the API, the token and the post
-  const formBrowseAPIURL = "https://awf-api.lvl99.dev";
-  const token = localStorage.getItem("token");
+
+  //const token = localStorage.getItem("token");
 
   // this is the post filter to sort by hot and limit to 10 posts, it will be appended to the API endpoint when fetching posts
   const postFilter = "?sort=hot&limit=10";
-
-  // Function to get token from API using username and password
+  
+  // Function to get token from API using username and password this helps to gain access of the forum 
   async function fetchToken() {
     try {
-      const response = await fetch(`${formBrowseAPIURL}/login`, {
+      const response = await fetch(`${baseURL}/auth/login`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,17 +30,30 @@ export default function ForumBrowserPage() {
         body: JSON.stringify({ username, password }),
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        setError(`Failed to get token. ${text}`);
+      // Read response as text first for debugging
+      const text = await response.text();
+      console.log("Login status:", response.status);
+      console.log("Login response body:", text);
+
+      // Try to parse JSON from text
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error("Failed to parse login response JSON:", err);
+        setError("Failed to parse login response. Check console for details.");
         return null;
       }
 
-      const data = await response.json();
-      
+      if (!response.ok) {
+        setError(`Failed to get token. ${data.message || text}`);
+        return null;
+      }
+
       // here im saving the token in local storage
-      localStorage.setItem("token", data.token); 
-      return data.token;
+      localStorage.setItem("token", data.access_token);
+     return data.access_token;
+
       
     } catch (err) {
       console.error(err);
@@ -57,20 +69,19 @@ export default function ForumBrowserPage() {
     setError(null);
 
     try {
+      // Remove any old token before fetching a new one
+      localStorage.removeItem("token");
 
-      // Get token if it doesn't exist
-      let apiToken = token;
+      // Get token from API
+      const apiToken = await fetchToken();
       if (!apiToken) {
-        apiToken = await fetchToken();
-        if (!apiToken) {
-          setLoading(false);
-          return;
-        }
+        setLoading(false);
+        return;
       }
 
       // here we fetch the posts from the API using the forum name and the post filter (sort by hot and limit to 10 posts)
       // encode helps to safely include forum names with spaces or special characters in the URL
-      const url = `${formBrowseAPIURL}/forums/${encodeURIComponent(forumName)}${postFilter}`;
+      const url = `${baseURL}/forums/${encodeURIComponent(forumName)}${postFilter}`;
       console.log("Requesting:", url);
 
       const response = await fetch(url, {
@@ -210,6 +221,7 @@ export default function ForumBrowserPage() {
             <Text c="dimmed" ta="center" mt="xl">
               No posts to display. Search for a forum to begin.
             </Text>
+            
           </div>
         )}
       </Stack>

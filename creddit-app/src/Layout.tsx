@@ -3,8 +3,11 @@ import React from "react";
 import { Container, Paper, Title, Text } from "@mantine/core";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const username = "egulti";
-  const studentID = "8744128";
+
+
+  // using environment variable to get the student ID, this is set in the .env file
+  const username = import.meta.env.VITE_API_USERNAME;
+  const studentID = import.meta.env.VITE_API_PASSWORD;
 
   return (
     <div
