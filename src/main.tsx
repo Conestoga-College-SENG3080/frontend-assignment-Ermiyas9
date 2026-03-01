@@ -8,7 +8,7 @@ import App from "./App";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/frontend-assignment-Ermiyas9/">
       <MantineProvider>
         <App />
       </MantineProvider>
