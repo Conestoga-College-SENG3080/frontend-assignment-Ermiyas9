@@ -1,0 +1,17 @@
+
+// src/main.tsx or index.tsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { MantineProvider } from "@mantine/core";
+import App from "./App";
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <BrowserRouter basename="/frontend-assignment-Ermiyas9/">
+      <MantineProvider>
+        <App />
+      </MantineProvider>
+    </BrowserRouter>
+  </StrictMode>
+);
