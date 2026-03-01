@@ -1,5 +1,5 @@
 // src/pages/FavouritesPage.tsx
-import { Text, Stack, Card } from '@mantine/core';
+import { Text, Stack, Card, Button } from '@mantine/core';
 import { useState, useEffect } from "react";
 
 export default function FavouritesPage() {
@@ -40,6 +40,7 @@ export default function FavouritesPage() {
 
         // then fetch each post by id from the API and save them in local state to display in the page
         const posts: any[] = [];
+        // then loop through the fav posts and save them in local state to display pr later to remove from fav. 
         for (const id of favoriteIds) {
           const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
             headers: {
@@ -63,35 +64,57 @@ export default function FavouritesPage() {
       }
     }
 
+    // remove a post from favorites
+    function removeFromFavorites(postId: string) {
+      const updated = favoritePosts.filter((p) => p.id !== postId);
+      setFavoritePosts(updated);
 
-  // This page will show posts the user has saved as favourites.
-  return (
-    <Stack gap="md">
-      <Text fw={600} size="lg">{username}'s Favourites</Text>
+      const stored = localStorage.getItem("favorites");
+      if (stored) {
+        const ids: string[] = JSON.parse(stored).filter(
+          (id: string) => id !== postId
+        );
+        localStorage.setItem("favorites", JSON.stringify(ids));
+      }
+    }
 
-      {loading && <Text>Loading favourites…</Text>}
-      {error && <Text c="red">{error}</Text>}
+    // if the page is loading show loading text, if there is an error show error message, otherwise show the favourite posts.
+    if (loading) return <Text>Loading favourites…</Text>;
+    if (error) return <Text c="red">{error}</Text>;
 
-      {favoritePosts.length === 0 && !loading && (
-        <Text c="dimmed">No favourite posts saved.</Text>
-      )}
 
-      {favoritePosts.map((post) => (
-        <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder>
-          <Text fw={600} size="lg">
-            {post.title}
-          </Text>
-          <Text size="sm" mt="xs">
-            {post.content}
-          </Text>
-          <Text size="sm" c="dimmed" mt="sm">
-            Author: {post.author || "Unknown"}
-          </Text>
-          <Text size="sm" c="dimmed">
-            Likes: {post.score ?? 0}
-          </Text>
-        </Card>
-      ))}
-    </Stack>
-  );
-}
+    // This page will show posts the user has saved as favourites.
+    return (
+      <Stack gap="md">
+        <Text fw={600} size="lg">{username}'s Favourites</Text>
+
+        {loading && <Text>Loading favourites…</Text>}
+        {error && <Text c="red">{error}</Text>}
+
+        {favoritePosts.length === 0 && !loading && (
+          <Text c="dimmed">No favourite posts saved.</Text>
+        )}
+
+        {favoritePosts.map((post) => (
+          <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder>
+            <Text fw={600} size="lg">
+              {post.title}
+            </Text>
+            <Text size="sm" mt="xs">
+              {post.content}
+            </Text>
+            <Text size="sm" c="dimmed" mt="sm">
+              Author: {post.author || "Unknown"}
+            </Text>
+            <Text size="sm" c="dimmed">
+              Likes: {post.score ?? 0}
+            </Text>
+            <Button mt="md" color="red" onClick={() => removeFromFavorites(post.id)}>
+              Remove from Favorites
+            </Button>
+          </Card>
+        ))}
+      </Stack>
+    );
+  }
+
