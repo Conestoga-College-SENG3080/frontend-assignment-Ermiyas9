@@ -91,14 +91,18 @@ export default function FavouritesPage() {
     // This page will show posts the user has saved as favourites.
     return (
       <Stack gap="md">
-        <Text fw={600} size="lg">{username}'s Favourites</Text>
-        <Button
-          mt="md"
-          style={{ backgroundColor: "#4CAF50", color: "white" }}
-          onClick={() => navigate("/forum")}
-        >
-          Go to Forum
-        </Button>
+        <Text 
+          fw={700} fz="2.0rem" >{username}'s Favourites</Text>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            mt="md"
+            style={{  paddingBottom: "0.5rem",
+                paddingTop: "0.5rem", backgroundColor: "#4CAF50", color: "white" }}
+            onClick={() => navigate("/")}
+          >
+            Go to Forum
+          </Button>
+        </div>
 
 
         {loading && <Text>Loading favourites…</Text>}
@@ -120,7 +124,7 @@ export default function FavouritesPage() {
               Author: {post.author || "Unknown"}
             </Text>
             <Text size="sm" c="dimmed">
-              Likes: {post.score ?? 0}
+              Likes: {post.totalLikes ?? 0}
             </Text>
             <Button mt="md" color="red" 
               style={{

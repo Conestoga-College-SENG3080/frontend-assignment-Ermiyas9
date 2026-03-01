@@ -129,11 +129,11 @@ export default function ForumBrowserPage() {
   return (
     <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "left", padding: "20px" }}>
       <div style={{ width: "100%", maxWidth: "500px", textAlign: "left", marginBottom: "40px" }}>
-        <Text fz="2xl" fw={600}>
+        <Text  fw={700} fz="2.0rem">
           Welcome to Browse a Forum, {username}
         </Text>
-        <Text fz="md" color="dimmed">
-          Student ID: {password}
+        <Text c="dimmed" mt="xs">
+          Enter a forum name to load the top 10 hot posts. You can also save posts to your favorites and view them on the favorites page.
         </Text>
       </div>
 
@@ -210,6 +210,8 @@ export default function ForumBrowserPage() {
 
     // this is where we check if the post is in the favorites list, we get the favorites from local storage and check if the post id is in the favorites array
     const isFavorite = favorites.includes(post.id); 
+    console.log("Fetched post:", post);
+
     return (
             
             <Card key={post.id} shadow="sm" padding="lg" radius="md" withBorder style={{ width: "100%" }}>
@@ -223,7 +225,9 @@ export default function ForumBrowserPage() {
                 Author: {post.author || "Unknown"}
               </Text>
               <Text size="sm" c="dimmed">
-                Likes: {post.score ?? 0}
+                Likes: {post.totalLikes ?? 0}
+
+                
               </Text>
               {/* then i add fav button here  */}
               <Button
