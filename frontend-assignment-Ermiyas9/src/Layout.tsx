@@ -1,9 +1,28 @@
-// src/Layout.tsx
-import React from "react";
+/* ================================================================================================================================== */
+/* FILE           : Layout.tsx                                                                                                        */
+/* PROJECT        : Frontend Programming Assignment                                                                                   */
+/* PROGRAMMER     : Ermiyas Gulti                                                                                                     */  
+/* FIRST VERSION  : 2024-06-01                                                                                                        */
+/* DESCRIPTION    : This file contains the Layout component, which provides a consistent structure and styling .                      */
+/*                : for all pages in the application It includes a header with the application title and user information,            */
+/*                : and renders the child components passed to it. The layout is designed to be responsive and visually appealing,    */
+/*                : using Mantine components for styling.                                                                             */
+/* ================================================================================================================================== */
+
+// importing necessary components and hooks from React, React Router, and the Layout component for consistent page structure.
+import React from "react"; 
 import { Container, Paper, Title, Text } from "@mantine/core";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
 
+/* FUNCTION     : Layout
+ * DESCRIPTION  : This component provides a consistent structure and styling for all pages in the application. 
+ *              : It includes a header with the application title and user information, 
+ *              : and renders the child components passed to it. The layout is designed to be responsive and visually appealing, 
+ *              : using Mantine components for styling and also it helpsss to display student info in every page.
+ * PARAMETERS   : children - The child components to be rendered within the layout
+ * RETURNS      : JSX.Element - The rendered component
+*/
+export default function Layout({ children }: { children: React.ReactNode }) {
 
   // using environment variable to get the student ID, this is set in the .env file
   const username = import.meta.env.VITE_API_USERNAME;
@@ -46,7 +65,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             User: {username} &nbsp;|&nbsp; Student ID: {studentID || "N/A"}
           </Text>
         </Paper>
-
         <main>{children}</main>
       </Container>
     </div>
