@@ -2,10 +2,14 @@
 import { Text, Stack, Card, Button } from '@mantine/core';
 import { useState, useEffect } from "react";
 import remove from "../assets/remove.png";
+import { useNavigate } from "react-router-dom";
+
 
 export default function FavouritesPage() {
 
   const username = import.meta.env.VITE_API_USERNAME;
+  const navigate = useNavigate();
+
 
   // first i am saving the favourite posts in local state, that comes from forum browser page then  
   // i will load them from local storage and display them in this page
@@ -88,6 +92,14 @@ export default function FavouritesPage() {
     return (
       <Stack gap="md">
         <Text fw={600} size="lg">{username}'s Favourites</Text>
+        <Button
+          mt="md"
+          style={{ backgroundColor: "#4CAF50", color: "white" }}
+          onClick={() => navigate("/forum")}
+        >
+          Go to Forum
+        </Button>
+
 
         {loading && <Text>Loading favourites…</Text>}
         {error && <Text c="red">{error}</Text>}
