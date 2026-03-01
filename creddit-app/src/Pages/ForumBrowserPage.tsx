@@ -230,6 +230,8 @@ export default function ForumBrowserPage() {
                 mt="md"
                 style={{
                   // so the button will be yellow if the post is in favorites and green if not
+                    paddingBottom: "0.5rem",
+              paddingTop: "0.5rem",
                   backgroundColor: isFavorite ? "yellow" : "#4CAF50", 
                   color: isFavorite ? "black" : "white", 
                 }}

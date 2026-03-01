@@ -1,6 +1,7 @@
 // src/pages/FavouritesPage.tsx
 import { Text, Stack, Card, Button } from '@mantine/core';
 import { useState, useEffect } from "react";
+import remove from "../assets/remove.png";
 
 export default function FavouritesPage() {
 
@@ -109,7 +110,20 @@ export default function FavouritesPage() {
             <Text size="sm" c="dimmed">
               Likes: {post.score ?? 0}
             </Text>
-            <Button mt="md" color="red" onClick={() => removeFromFavorites(post.id)}>
+            <Button mt="md" color="red" 
+              style={{
+              paddingBottom: "0.5rem",
+              paddingTop: "0.5rem",
+              color: "white",
+              backgroundColor: "#4CAF50",
+              }}  
+            onClick={() => removeFromFavorites(post.id)}>
+               <img 
+                  src={remove} 
+                  alt="Remove from Favorites" 
+                  style={{ width: "16px", height: "16px", paddingRight: "8px" }} 
+                />
+            
               Remove from Favorites
             </Button>
           </Card>
